@@ -1,6 +1,8 @@
 package com.mahendra;
 
 import java.util.List;
+import java.util.Scanner;
+
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.DeleteMessageRequest;
@@ -18,12 +20,18 @@ public class App {
         SqsClient client = SqsClient.builder()
                 .region(Region.US_EAST_1)
                 .build();
-        
+        Scanner sc = new Scanner(System.in);
         // List all Queues 
         listQueues(client);
-        sendMessage(client, "Hello Pune !");
+        sendMessage(client, "Hello Hinjewadi !");
         System.out.println("Start reading messages ...");
+        String choice="yes";
+
+        while(choice.equalsIgnoreCase("yes")){
         receiveMessage(client);
+        System.out.println("Do you want to poll for more messages ?");
+        choice = sc.nextLine();
+        }
     }
 
     static void listQueues(SqsClient client) {
@@ -48,11 +56,12 @@ public class App {
 
     static void receiveMessage(SqsClient client){
         ReceiveMessageRequest req = ReceiveMessageRequest.builder()
-                                            .queueUrl(queueURL) 
-                                            .maxNumberOfMessages(5)
-                                            .waitTimeSeconds(10)
-                                            .build();
-        
+                                        .queueUrl(queueURL) 
+                                        .maxNumberOfMessages(5)
+                                        .waitTimeSeconds(20)
+                                        .visibilityTimeout(2)
+                                        .build();
+    
         ReceiveMessageResponse resp = client.receiveMessage(req);
         List<Message> messages =  resp.messages();
         System.out.println("Found "+messages.size()+" messages");
@@ -65,6 +74,11 @@ public class App {
                                         .receiptHandle(msg.receiptHandle())
                                         .build();
             client.deleteMessage(del);
+            try{
+                Thread.sleep(10);
+            }catch(InterruptedException ex){
+                ex.printStackTrace();
+            }
         }
     }
 }
