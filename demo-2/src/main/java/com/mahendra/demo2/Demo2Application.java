@@ -16,6 +16,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 public class Demo2Application implements CommandLineRunner{
 
 	private String bucketName = "test536526";
+	
 	public void setBucketName(String bucketName) {
 		this.bucketName = bucketName;
 	}
